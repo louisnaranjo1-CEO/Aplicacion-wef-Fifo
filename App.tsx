@@ -57,6 +57,45 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  // --- NOTIFICACIONES DE CARRITO ABANDONADO ---
+  useEffect(() => {
+    let notificationTimer: ReturnType<typeof setTimeout>;
+
+    // Solo configurar si hay items en el carrito y NO estamos en el checkout
+    if (cart.length > 0 && !isCheckoutOpen) {
+      
+      // NOTA: La solicitud de permiso se movió a addToCart para cumplir con políticas de navegadores
+      
+      // Configurar temporizador (1 minuto de inactividad para demostración)
+      notificationTimer = setTimeout(() => {
+        if ('Notification' in window && Notification.permission === 'granted') {
+          try {
+            // Enviar notificación al sistema (Barra de estado del teléfono)
+            const notif = new Notification("🍔 ¡Tu pedido te espera!", {
+              body: "¡Tienes en tu carrito un rico pedido esperando por ti, pide ya!",
+              icon: "https://gqdfbwdocqrkziacvzkb.supabase.co/storage/v1/object/public/Louis%20Marketing/Grupo%20Fifo/logo%20nuevo2.png",
+              tag: "fifo-cart-reminder", // Evita que se acumulen muchas notificaciones iguales
+              requireInteraction: true, // Se queda en pantalla hasta que el usuario la vea
+              badge: "https://gqdfbwdocqrkziacvzkb.supabase.co/storage/v1/object/public/Louis%20Marketing/Grupo%20Fifo/logo%20nuevo2.png"
+            });
+
+            // Al hacer click, enfocar la ventana y abrir el carrito
+            notif.onclick = function() {
+              window.focus();
+              setIsCartOpen(true);
+              notif.close();
+            };
+          } catch (e) {
+            console.error("Error enviando notificación", e);
+          }
+        }
+      }, 60000); // 60000 ms = 1 minuto
+    }
+
+    // Limpiar temporizador si el componente se desmonta, el carrito cambia (usuario activo) o abre checkout
+    return () => clearTimeout(notificationTimer);
+  }, [cart, isCheckoutOpen]);
+
   // Logic to fetch prices from Google Sheets
   useEffect(() => {
     if (!GOOGLE_SHEET_URL) return;
@@ -118,6 +157,11 @@ function App() {
 
   // Cart Logic
   const addToCart = (product: Product, variant?: ProductVariant, quantity: number = 1) => {
+    // 1. Solicitar permiso de notificaciones con interacción del usuario (Crucial para móviles)
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
     setCart(prev => {
       // Create a unique ID for the cart item based on product ID AND variant ID
       const cartId = variant ? `${product.id}-${variant.id}` : product.id;
