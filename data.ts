@@ -173,6 +173,126 @@ export const products: Product[] = [
     variants: PIZZA_VARIANTS(6, 11, 16)
   },
 
+  // --- PERROS CALIENTES / HOT DOGS ---
+  {
+    id: 'perro-normal',
+    name: 'Perro Normal',
+    price: 1.50,
+    description: 'El clásico sabor con el toque crujiente de los chips.',
+    items: ['Salchicha', 'Ensalada', 'Papitas Rayadas', 'Queso de Año', 'Salsas', 'Ración de Chips'],
+    image: 'https://images.unsplash.com/photo-1612392062631-94dd858cba88?q=80&w=500&auto=format&fit=crop',
+    category: 'hot_dogs'
+  },
+  {
+    id: 'perro-especial',
+    name: 'Perro Especial',
+    price: 2.00,
+    description: 'Con extra sabor y queso amarillo fundido.',
+    items: ['Salchicha', 'Ensalada', 'Papitas Rayadas', 'Queso Amarillo', 'Queso de Año'],
+    image: 'https://images.unsplash.com/photo-1599599810769-bcde5a823097?q=80&w=500&auto=format&fit=crop',
+    category: 'hot_dogs'
+  },
+  {
+    id: 'perro-fifo',
+    name: 'Perro Fifo',
+    price: 3.00,
+    description: '¡El más completo! Cargado con todo lo que te gusta.',
+    items: ['Salchicha', 'Tocineta Rayada', 'Jamón', 'Maíz', 'Queso Amarillo', 'Queso de Año', 'Ensalada', 'Papitas Rayadas', 'Ración de Chips'],
+    image: 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?q=80&w=500&auto=format&fit=crop',
+    category: 'hot_dogs',
+    isPopular: true,
+    promoLabel: 'FULL EQUIPO'
+  },
+
+  // --- REFRIGERADOS ---
+  {
+    id: 'mantequilla-500g',
+    name: 'Mantequilla con Sal 500g',
+    price: 3.50,
+    description: 'Ideal para untar o cocinar tus postres favoritos.',
+    items: ['Envase 500g', 'Con Sal'],
+    image: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?q=80&w=500&auto=format&fit=crop',
+    category: 'refrigerated'
+  },
+  {
+    id: 'yogurt-litro',
+    name: 'Yogurt Líquido 1L',
+    price: 2.80,
+    description: 'Yogurt cremoso de fresa o durazno.',
+    items: ['Botella 1 Litro', 'Sabor Frutas'],
+    image: 'https://images.unsplash.com/photo-1562122396-932f915d9782?q=80&w=500&auto=format&fit=crop',
+    category: 'refrigerated'
+  },
+  {
+    id: 'queso-blanco-duro',
+    name: 'Queso Blanco Duro (kg)',
+    price: 6.50,
+    description: 'El mejor queso llanero para rallar.',
+    items: ['Venta por Kilo', 'Salado'],
+    image: 'https://images.unsplash.com/photo-1624806992066-5d54624d306a?q=80&w=500&auto=format&fit=crop',
+    category: 'refrigerated',
+    isPopular: true
+  },
+
+  // --- EMBUTIDOS ---
+  {
+    id: 'jamon-pierna',
+    name: 'Jamón de Pierna (kg)',
+    price: 8.00,
+    description: 'Jamón cocido de primera calidad.',
+    items: ['Venta por Kilo', 'Rebanado fino'],
+    image: 'https://images.unsplash.com/photo-1602492659092-23c345371c62?q=80&w=500&auto=format&fit=crop',
+    category: 'sausages'
+  },
+  {
+    id: 'salchichon',
+    name: 'Salchichón (Barra)',
+    price: 4.50,
+    description: 'Perfecto para picar o acompañar.',
+    items: ['Barra entera', 'Tipo Cerveceros'],
+    image: 'https://images.unsplash.com/photo-1582234057039-b9d9dc49b990?q=80&w=500&auto=format&fit=crop',
+    category: 'sausages'
+  },
+  {
+    id: 'chorizo-ahumado',
+    name: 'Chorizo Ahumado (Paq)',
+    price: 3.90,
+    description: 'Paquete de chorizos parrilleros.',
+    items: ['Paquete 500g', 'Sabor Ahumado'],
+    image: 'https://images.unsplash.com/photo-1595486981156-829d4791e847?q=80&w=500&auto=format&fit=crop',
+    category: 'sausages'
+  },
+
+  // --- CARNICERÍA ---
+  {
+    id: 'carne-molida',
+    name: 'Carne Molida (kg)',
+    price: 5.50,
+    description: 'Carne de res magra, ideal para salsas y hamburguesas.',
+    items: ['Venta por Kilo', 'Sin Grasa'],
+    image: 'https://images.unsplash.com/photo-1594916374026-b52b31175654?q=80&w=500&auto=format&fit=crop',
+    category: 'butchery'
+  },
+  {
+    id: 'bistec-solomo',
+    name: 'Bistec de Solomo (kg)',
+    price: 7.00,
+    description: 'Corte tierno y jugoso para asar o freír.',
+    items: ['Venta por Kilo', 'Corte Fresco'],
+    image: 'https://images.unsplash.com/photo-1607623814075-e51df1bd6562?q=80&w=500&auto=format&fit=crop',
+    category: 'butchery',
+    isPopular: true
+  },
+  {
+    id: 'pechuga-pollo',
+    name: 'Pechuga de Pollo (kg)',
+    price: 4.80,
+    description: 'Pechuga entera o fileteada.',
+    items: ['Venta por Kilo', 'Sin Piel'],
+    image: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?q=80&w=500&auto=format&fit=crop',
+    category: 'butchery'
+  },
+
   // --- PANADERIA / BAKERY ---
   {
     id: 'pan-canilla',

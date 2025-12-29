@@ -40,12 +40,12 @@ export const Header: React.FC<HeaderProps> = ({ cartItemCount, onOpenCart, onOpe
   return (
     <>
       <header className="sticky top-0 z-40 bg-fifo-red text-white shadow-lg border-b-4 border-fifo-yellow">
-        <div className="container mx-auto px-4 py-2 flex justify-between items-center relative h-16 md:h-20">
+        <div className="container mx-auto px-4 py-2 flex justify-between items-center relative h-14 md:h-20">
           
           {/* Left: Nav */}
           <div className="flex-1 flex justify-start items-center z-20 gap-4">
             <button onClick={toggleMobileMenu} className="md:hidden p-2 -ml-2 rounded-full active:scale-95" aria-label="Abrir menú">
-              <Menu size={28} strokeWidth={2.5} />
+              <Menu size={24} strokeWidth={2.5} />
             </button>
             <nav className="hidden md:flex gap-6 font-bold text-sm items-center">
               <a href="#" onClick={handleScrollTop} className="hover:text-fifo-yellow transition-colors whitespace-nowrap p-1">INICIO</a>
@@ -60,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({ cartItemCount, onOpenCart, onOpe
             <img 
               src="https://gqdfbwdocqrkziacvzkb.supabase.co/storage/v1/object/public/Louis%20Marketing/Grupo%20Fifo/logo%20nuevo2.png" 
               alt="Grupo Fifo" 
-              className="h-12 md:h-16 object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-md relative z-10" 
+              className="h-10 md:h-16 object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-md relative z-10" 
             />
           </div>
 
@@ -106,10 +106,10 @@ export const Header: React.FC<HeaderProps> = ({ cartItemCount, onOpenCart, onOpe
               </button>
             )}
 
-            <button onClick={onOpenCart} className="relative bg-fifo-yellow text-fifo-red p-2 rounded-lg hover:bg-yellow-300 transition-colors shadow-md active:scale-95">
-              <ShoppingCart size={20} className="md:w-6 md:h-6" strokeWidth={2.5} />
+            <button onClick={onOpenCart} className="relative bg-fifo-yellow text-fifo-red p-1.5 md:p-2 rounded-lg hover:bg-yellow-300 transition-colors shadow-md active:scale-95">
+              <ShoppingCart size={18} className="md:w-6 md:h-6" strokeWidth={2.5} />
               {cartItemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-white text-fifo-red text-[10px] md:text-xs font-black h-4 w-4 md:h-5 md:w-5 flex items-center justify-center rounded-full border-2 border-fifo-red">
+                <span className="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2 bg-white text-fifo-red text-[9px] md:text-[10px] font-black h-3.5 w-3.5 md:h-5 md:w-5 flex items-center justify-center rounded-full border-2 border-fifo-red">
                   {cartItemCount}
                 </span>
               )}

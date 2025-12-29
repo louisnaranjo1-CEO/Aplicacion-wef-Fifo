@@ -192,6 +192,9 @@ function App() {
     { id: 'burgers', label: 'Hamburguesas 🍔' },
     { id: 'hot_dogs', label: 'Perros 🌭' },
     { id: 'self_service', label: 'Self Service 🥘' },
+    { id: 'refrigerated', label: 'Refrigerados 🧀' },
+    { id: 'sausages', label: 'Embutidos 🥓' },
+    { id: 'butchery', label: 'Carnicería 🥩' },
     { id: 'breakfast', label: 'Desayunos' },
     { id: 'bakery', label: 'Panadería 🥖' },
     { id: 'drinks', label: 'Bebidas 🥤' },
@@ -219,7 +222,7 @@ function App() {
         
         {/* Filter Scrollbar - FIXED FOR HORIZONTAL SCROLLING */}
         <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
-          <div className="flex gap-3 overflow-x-auto pb-4 pt-2 px-1 scrollbar-hide w-full max-w-full">
+          <div className="flex gap-2 md:gap-3 overflow-x-auto pb-4 pt-2 px-1 scrollbar-hide w-full max-w-full">
             {categories.map(cat => (
               <button
                 key={cat.id}
@@ -240,7 +243,7 @@ function App() {
                     setSelectedCategory(cat.id);
                   }
                 }}
-                className={`whitespace-nowrap px-6 py-3 rounded-full font-bold shadow-md transition-all ${
+                className={`whitespace-nowrap px-4 py-2 md:px-6 md:py-3 text-xs md:text-base rounded-full font-bold shadow-md transition-all ${
                   selectedCategory === cat.id && !['self_service', 'chicken', 'burgers', 'hot_dogs', 'ice_cream'].includes(cat.id)
                     ? 'bg-fifo-red text-white scale-105 ring-2 ring-fifo-yellow ring-offset-2' 
                     : ['self_service', 'chicken', 'burgers', 'hot_dogs', 'ice_cream'].includes(cat.id)
@@ -260,8 +263,8 @@ function App() {
           )}
         </div>
 
-        {/* Product Grid - Updated to 2 columns on mobile (grid-cols-2) */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
+        {/* Product Grid - Updated to 2 columns on mobile (grid-cols-2) with tighter gap */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-6">
           {filteredProducts.map(product => (
             <ProductCard 
               key={product.id} 
