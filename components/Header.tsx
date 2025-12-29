@@ -176,8 +176,8 @@ export const Header: React.FC<HeaderProps> = ({ cartItemCount, onOpenCart, onOpe
       
       {/* Detailed About Us Modal */}
       {showAbout && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setShowAbout(false)}>
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center relative shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowAbout(false)}>
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full text-center relative shadow-2xl animate-in zoom-in-95 duration-200 max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <button onClick={() => setShowAbout(false)} className="absolute top-4 right-4 text-gray-400 hover:text-fifo-red transition-colors">
               <X size={24} />
             </button>

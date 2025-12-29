@@ -150,27 +150,30 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm md:p-4 overflow-hidden">
-      <div className="bg-white w-full h-full md:h-auto md:max-h-[90vh] md:rounded-2xl md:max-w-2xl shadow-2xl overflow-y-auto relative md:my-8 animate-in slide-in-from-bottom duration-300 md:animate-in md:zoom-in-95 flex flex-col">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" />
+      
+      {/* Modal Container */}
+      <div 
+        className="bg-white w-full max-w-2xl max-h-[85vh] rounded-2xl shadow-2xl relative animate-in zoom-in-95 duration-300 flex flex-col overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
         
-        {/* Mobile Header */}
-        <div className="p-4 flex items-center justify-between border-b border-gray-100 bg-white sticky top-0 z-20">
+        {/* Header */}
+        <div className="p-4 flex items-center justify-between border-b border-gray-100 bg-white sticky top-0 z-20 shrink-0">
             <div className="flex items-center gap-2">
-                <button onClick={onClose} className="md:hidden mr-2">
-                    <ArrowLeft size={24} className="text-gray-600" />
-                </button>
-                <h3 className="font-black text-xl uppercase">Confirmar Pedido</h3>
+                <h3 className="font-black text-xl uppercase text-gray-800">Confirmar Pedido</h3>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 bg-gray-100 rounded-full p-1 hidden md:block">
-                <X size={24} />
+            <button onClick={onClose} className="text-gray-400 hover:text-red-500 bg-gray-50 rounded-full p-2 transition-colors">
+                <X size={20} />
             </button>
         </div>
 
-        <div className="flex flex-col md:flex-row h-full">
+        <div className="flex flex-col md:flex-row h-full overflow-hidden">
           {/* Cart Summary Column */}
-          <div className="w-full md:w-2/5 bg-gray-50 p-6 border-r border-gray-100 flex flex-col shrink-0">
-            <h3 className="font-bold text-sm text-gray-500 uppercase mb-4 flex items-center gap-2 hidden md:flex"><ShoppingBag size={16} /> Resumen</h3>
-            <div className="space-y-3 mb-6 max-h-[30vh] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="w-full md:w-2/5 bg-gray-50 p-4 md:p-6 border-b md:border-b-0 md:border-r border-gray-100 flex flex-col shrink-0 max-h-[30vh] md:max-h-full overflow-y-auto">
+            <h3 className="font-bold text-sm text-gray-500 uppercase mb-3 flex items-center gap-2 sticky top-0 bg-gray-50 z-10 py-1"><ShoppingBag size={16} /> Resumen</h3>
+            <div className="space-y-3 mb-4 pr-2">
               {cart.map(item => (
                 <div key={item.cartId} className="flex justify-between text-sm items-start">
                   <span className="text-gray-600 leading-tight">
@@ -181,31 +184,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </div>
               ))}
             </div>
-            {suggestedProducts.length > 0 && (
-              <div className="mt-auto mb-4 bg-white p-3 rounded-xl border border-fifo-yellow/30 shadow-sm hidden md:block">
-                <div className="flex items-center gap-1 mb-2 text-fifo-darkRed"><Sparkles size={14} /><span className="text-xs font-black uppercase">¿Un antojito extra?</span></div>
-                <div className="space-y-2">
-                  {suggestedProducts.map(prod => (
-                    <div key={prod.id} className="flex items-center gap-2 group">
-                      <img src={prod.image} alt={prod.name} className="w-10 h-10 rounded-md object-cover bg-gray-100" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-gray-800 truncate">{prod.name}</p>
-                        <p className="text-xs text-fifo-red font-bold">${prod.price}</p>
-                      </div>
-                      <button onClick={() => onAdd(prod)} className="bg-gray-100 hover:bg-fifo-red hover:text-white p-1.5 rounded-full transition-colors"><Plus size={14} /></button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            <div className="border-t border-gray-200 pt-4">
+            
+            <div className="border-t border-gray-200 pt-3 mt-auto">
               <div className="flex justify-between items-center text-lg mb-2">
                 <span className="font-bold text-gray-700">Total a Pagar</span>
                 <span className="font-black text-2xl text-fifo-red">${total.toFixed(2)}</span>
               </div>
               {user && pointsToEarn > 0 && (
-                 <div className="flex items-center justify-center gap-2 bg-yellow-50 text-yellow-800 text-xs font-bold py-2 rounded-lg border border-yellow-200">
-                    <Star size={14} fill="currentColor" className="text-yellow-500" />
+                 <div className="flex items-center justify-center gap-2 bg-yellow-50 text-yellow-800 text-[10px] font-bold py-1.5 rounded-lg border border-yellow-200">
+                    <Star size={12} fill="currentColor" className="text-yellow-500" />
                     Ganarás +{pointsToEarn} Puntos (Al validar)
                  </div>
               )}
@@ -213,65 +200,62 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           </div>
 
           {/* Form Column */}
-          <div className="w-full md:w-3/5 p-6 bg-white flex-1 overflow-y-auto">
-            <h3 className="font-black text-lg uppercase mb-4 md:mb-6 hidden md:block">Datos de Envío</h3>
-            <form onSubmit={handleSubmit} className="space-y-5 pb-safe-bottom">
-              <div className="grid grid-cols-2 gap-3 p-1 bg-gray-100 rounded-xl">
-                <button type="button" onClick={() => setMethod('delivery')} className={`py-3 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${method === 'delivery' ? 'bg-white text-fifo-red shadow-md' : 'text-gray-500 hover:text-gray-700'}`}><Truck size={18} /> Delivery</button>
-                <button type="button" onClick={() => setMethod('pickup')} className={`py-3 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${method === 'pickup' ? 'bg-white text-fifo-red shadow-md' : 'text-gray-500 hover:text-gray-700'}`}><Store size={18} /> Retiro</button>
+          <div className="w-full md:w-3/5 p-4 md:p-6 bg-white flex-1 overflow-y-auto custom-scrollbar">
+            <h3 className="font-black text-base uppercase mb-4 hidden md:block">Datos de Envío</h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
+                <button type="button" onClick={() => setMethod('delivery')} className={`py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all ${method === 'delivery' ? 'bg-white text-fifo-red shadow-md' : 'text-gray-500 hover:text-gray-700'}`}><Truck size={16} /> Delivery</button>
+                <button type="button" onClick={() => setMethod('pickup')} className={`py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all ${method === 'pickup' ? 'bg-white text-fifo-red shadow-md' : 'text-gray-500 hover:text-gray-700'}`}><Store size={16} /> Retiro</button>
               </div>
               
               {profile ? (
-                  <div className="bg-green-50 border border-green-200 text-green-700 p-2 rounded-lg text-xs font-medium flex items-center gap-2">
+                  <div className="bg-green-50 border border-green-200 text-green-700 p-2 rounded-lg text-[10px] font-medium flex items-center gap-2">
                       <CheckCircle size={12} />
                       Datos cargados desde tu perfil
                   </div>
               ) : null}
-
-              {method === 'delivery' && <div className="bg-blue-50 text-blue-800 p-3 rounded-lg text-sm border border-blue-200 flex items-start gap-2"><MapPin size={16} className="mt-0.5 min-w-[16px]" /><span>El costo del delivery se indicará al confirmar.</span></div>}
-              {method === 'pickup' && <div className="bg-yellow-50 text-yellow-800 p-3 rounded-lg text-sm border border-yellow-200 flex items-start gap-2"><CheckCircle size={16} className="mt-0.5 min-w-[16px]" /><span>Retiro Sin Cola: Atento al llamado para pagar.</span></div>}
               
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre</label>
-                    <input required type="text" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-base text-black placeholder:text-gray-400" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Nombre</label>
+                    <input required type="text" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-black placeholder:text-gray-400 focus:border-fifo-red focus:bg-white transition-colors outline-none" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Cédula</label>
-                    <input required type="text" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-base text-black placeholder:text-gray-400" value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} />
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Cédula</label>
+                    <input required type="text" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-black placeholder:text-gray-400 focus:border-fifo-red focus:bg-white transition-colors outline-none" value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Teléfono</label>
-                  <input required type="tel" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-base text-black placeholder:text-gray-400" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Teléfono</label>
+                  <input required type="tel" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-black placeholder:text-gray-400 focus:border-fifo-red focus:bg-white transition-colors outline-none" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
                 </div>
                 {method === 'delivery' ? (
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Dirección</label>
-                    <textarea required rows={2} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-base text-black placeholder:text-gray-400" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})}></textarea>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Dirección</label>
+                    <textarea required rows={2} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-black placeholder:text-gray-400 focus:border-fifo-red focus:bg-white transition-colors outline-none resize-none" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})}></textarea>
                   </div>
                 ) : (
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Sucursal</label>
-                    <select className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-base text-black">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Sucursal</label>
+                    <select className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-black">
                       <option>Calabozo Carrera 12</option>
                     </select>
                   </div>
                 )}
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Pago</label>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Pago</label>
                   <div className="relative">
-                    <select required className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 appearance-none font-medium text-base text-black" value={formData.payment} onChange={e => setFormData({...formData, payment: e.target.value})}>
+                    <select required className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 appearance-none font-medium text-sm text-black outline-none" value={formData.payment} onChange={e => setFormData({...formData, payment: e.target.value})}>
                       <option value="pago_movil">📱 Pago Móvil</option>
                       <option value="efectivo_bs">💵 Efectivo Bs</option>
                       <option value="efectivo_usd">💲 Efectivo Divisa $</option>
                     </select>
-                    <Wallet size={16} className="absolute right-3 top-4 text-gray-500 pointer-events-none" />
+                    <Wallet size={14} className="absolute right-3 top-3 text-gray-500 pointer-events-none" />
                   </div>
                 </div>
               </div>
-              <Button type="submit" fullWidth className="bg-[#25D366] hover:bg-[#128C7E] text-white py-4 text-lg shadow-lg">CONFIRMAR VÍA WHATSAPP</Button>
+              <Button type="submit" fullWidth className="bg-[#25D366] hover:bg-[#128C7E] text-white py-3 text-base shadow-lg mt-2">CONFIRMAR VÍA WHATSAPP</Button>
             </form>
           </div>
         </div>

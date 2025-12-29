@@ -18,12 +18,12 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({ isOpen, onClose,
   const favoriteProducts = products.filter(p => favorites.includes(p.id));
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={onClose}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
       <div 
-        className="bg-white rounded-3xl w-full max-w-lg h-[80vh] flex flex-col shadow-2xl relative animate-in zoom-in-95 duration-200"
+        className="bg-white rounded-3xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl relative animate-in zoom-in-95 duration-200 overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
-        <div className="p-6 bg-fifo-red text-white rounded-t-3xl flex justify-between items-center shadow-md shrink-0">
+        <div className="p-6 bg-fifo-red text-white flex justify-between items-center shadow-md shrink-0">
           <div className="flex items-center gap-2">
             <Heart className="fill-white" size={24} />
             <h2 className="text-xl font-black uppercase">Mis Favoritos</h2>
@@ -33,7 +33,7 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({ isOpen, onClose,
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 custom-scrollbar">
           {favoriteProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-400 space-y-4">
               <Heart size={64} opacity={0.2} />

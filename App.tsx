@@ -392,47 +392,47 @@ function App() {
       
       {/* Self Service Modal */}
       {showSelfServiceModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setShowSelfServiceModal(false)}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowSelfServiceModal(false)}>
            <div 
-             className="bg-white rounded-3xl w-full max-w-md p-0 overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200"
+             className="bg-white rounded-2xl w-full max-w-md p-0 overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col"
              onClick={e => e.stopPropagation()}
            >
               {/* Header with Pattern */}
-              <div className="bg-fifo-yellow h-32 relative flex items-center justify-center overflow-hidden">
+              <div className="bg-fifo-yellow h-28 relative flex items-center justify-center overflow-hidden shrink-0">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-10"></div>
                 <div className="relative z-10 flex flex-col items-center">
-                    <div className="bg-white p-3 rounded-full shadow-lg mb-2">
-                      <Utensils size={32} className="text-fifo-red" />
+                    <div className="bg-white p-2 rounded-full shadow-lg mb-1">
+                      <Utensils size={24} className="text-fifo-red" />
                     </div>
-                    <h3 className="text-2xl font-black text-fifo-darkRed uppercase tracking-wide">Self Service</h3>
+                    <h3 className="text-xl font-black text-fifo-darkRed uppercase tracking-wide">Self Service</h3>
                 </div>
                 <button 
                   onClick={() => setShowSelfServiceModal(false)}
-                  className="absolute top-4 right-4 bg-black/10 hover:bg-black/20 text-fifo-darkRed p-2 rounded-full transition-colors"
+                  className="absolute top-3 right-3 bg-black/10 hover:bg-black/20 text-fifo-darkRed p-2 rounded-full transition-colors"
                 >
                   <X size={20} />
                 </button>
               </div>
 
-              <div className="p-8 text-center">
-                 <div className="mb-6 flex items-center justify-center gap-2 text-gray-500 font-bold bg-gray-100 py-2 rounded-lg">
-                    <Clock size={20} />
+              <div className="p-6 text-center overflow-y-auto">
+                 <div className="mb-4 flex items-center justify-center gap-2 text-gray-500 font-bold bg-gray-100 py-2 rounded-lg text-sm">
+                    <Clock size={16} />
                     <span>12:00 PM - 4:00 PM</span>
                  </div>
                  
-                 <p className="text-gray-700 text-lg leading-relaxed mb-6 font-medium">
+                 <p className="text-gray-700 text-base leading-relaxed mb-4 font-medium">
                    ¡Hola! 👋 Te recordamos que nuestro <span className="text-fifo-red font-bold">Self Service</span> y los deliciosos combos de <span className="text-fifo-red font-bold">Pollo a la Broaster</span> solo están disponibles en el horario del almuerzo.
                  </p>
 
-                 <div className="bg-yellow-50 border-l-4 border-fifo-yellow p-4 mb-8 text-left text-sm text-yellow-800">
+                 <div className="bg-yellow-50 border-l-4 border-fifo-yellow p-3 mb-6 text-left text-xs text-yellow-800">
                     <p>Acércate a nuestra sección de Self Service o escríbenos para saber qué preparamos hoy para ti. 🍲</p>
                  </div>
 
                  <button 
                    onClick={openSelfServiceWhatsApp}
-                   className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 uppercase tracking-wide"
+                   className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 uppercase tracking-wide text-sm"
                  >
-                   <MessageCircle size={24} fill="white" />
+                   <MessageCircle size={20} fill="white" />
                    Consultar Menú del Día
                  </button>
               </div>
@@ -442,39 +442,39 @@ function App() {
 
       {/* Pollo a la Broaster Modal */}
       {showChickenModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setShowChickenModal(false)}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowChickenModal(false)}>
            <div 
-             className="bg-white rounded-3xl w-full max-w-md p-0 overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200"
+             className="bg-white rounded-2xl w-full max-w-md p-0 overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col"
              onClick={e => e.stopPropagation()}
            >
               {/* Header with Pattern - SAME STYLE AS SELF SERVICE */}
-              <div className="bg-fifo-yellow h-32 relative flex items-center justify-center overflow-hidden">
+              <div className="bg-fifo-yellow h-28 relative flex items-center justify-center overflow-hidden shrink-0">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-10"></div>
                 <div className="relative z-10 flex flex-col items-center">
-                    <div className="bg-white p-3 rounded-full shadow-lg mb-2">
-                      <Drumstick size={32} className="text-fifo-red" />
+                    <div className="bg-white p-2 rounded-full shadow-lg mb-1">
+                      <Drumstick size={24} className="text-fifo-red" />
                     </div>
-                    <h3 className="text-2xl font-black text-fifo-darkRed uppercase tracking-wide text-center leading-none">Pollo a la<br/>Broaster</h3>
+                    <h3 className="text-xl font-black text-fifo-darkRed uppercase tracking-wide text-center leading-none">Pollo a la<br/>Broaster</h3>
                 </div>
                 <button 
                   onClick={() => setShowChickenModal(false)}
-                  className="absolute top-4 right-4 bg-black/10 hover:bg-black/20 text-fifo-darkRed p-2 rounded-full transition-colors"
+                  className="absolute top-3 right-3 bg-black/10 hover:bg-black/20 text-fifo-darkRed p-2 rounded-full transition-colors"
                 >
                   <X size={20} />
                 </button>
               </div>
 
-              <div className="p-8 text-center">
-                 <div className="mb-6 flex items-center justify-center gap-2 text-gray-500 font-bold bg-gray-100 py-2 rounded-lg">
-                    <Clock size={20} />
+              <div className="p-6 text-center overflow-y-auto">
+                 <div className="mb-4 flex items-center justify-center gap-2 text-gray-500 font-bold bg-gray-100 py-2 rounded-lg text-sm">
+                    <Clock size={16} />
                     <span>12:00 PM - 4:00 PM</span>
                  </div>
                  
-                 <p className="text-gray-700 text-lg leading-relaxed mb-6 font-medium">
+                 <p className="text-gray-700 text-base leading-relaxed mb-4 font-medium">
                    ¡Hola! 👋 Te recordamos que nuestros crujientes combos de <span className="text-fifo-red font-bold">Pollo a la Broaster</span> solo están disponibles en el horario del almuerzo.
                  </p>
 
-                 <div className="bg-yellow-50 border-l-4 border-fifo-yellow p-4 mb-8 text-left text-sm text-yellow-800">
+                 <div className="bg-yellow-50 border-l-4 border-fifo-yellow p-3 mb-6 text-left text-xs text-yellow-800">
                     <p>Escríbenos directamente para confirmar disponibilidad y pedir tu combo favorito. 🍗</p>
                  </div>
 
@@ -484,9 +484,9 @@ function App() {
                      setSelectedCategory('chicken');
                      handleOrderNow();
                    }}
-                   className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 uppercase tracking-wide"
+                   className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 uppercase tracking-wide text-sm"
                  >
-                   <MessageCircle size={24} fill="white" />
+                   <MessageCircle size={20} fill="white" />
                    ¡Pídelo Ya!
                  </button>
               </div>
@@ -496,45 +496,45 @@ function App() {
 
       {/* Evening Menu Modal (Burgers & Hot Dogs) */}
       {showEveningModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setShowEveningModal(false)}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowEveningModal(false)}>
            <div 
-             className="bg-white rounded-3xl w-full max-w-md p-0 overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200"
+             className="bg-white rounded-2xl w-full max-w-md p-0 overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col"
              onClick={e => e.stopPropagation()}
            >
               {/* Header with Pattern */}
-              <div className="bg-fifo-yellow h-32 relative flex items-center justify-center overflow-hidden">
+              <div className="bg-fifo-yellow h-28 relative flex items-center justify-center overflow-hidden shrink-0">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-10"></div>
                 <div className="relative z-10 flex flex-col items-center">
-                    <div className="bg-white p-3 rounded-full shadow-lg mb-2">
+                    <div className="bg-white p-2 rounded-full shadow-lg mb-1">
                       {eveningCategory === 'burgers' ? (
-                        <Sandwich size={32} className="text-fifo-red" />
+                        <Sandwich size={24} className="text-fifo-red" />
                       ) : (
-                        <Utensils size={32} className="text-fifo-red" />
+                        <Utensils size={24} className="text-fifo-red" />
                       )}
                     </div>
-                    <h3 className="text-2xl font-black text-fifo-darkRed uppercase tracking-wide text-center leading-none">
+                    <h3 className="text-xl font-black text-fifo-darkRed uppercase tracking-wide text-center leading-none">
                       {eveningCategory === 'burgers' ? 'Hamburguesas' : 'Perros Calientes'}
                     </h3>
                 </div>
                 <button 
                   onClick={() => setShowEveningModal(false)}
-                  className="absolute top-4 right-4 bg-black/10 hover:bg-black/20 text-fifo-darkRed p-2 rounded-full transition-colors"
+                  className="absolute top-3 right-3 bg-black/10 hover:bg-black/20 text-fifo-darkRed p-2 rounded-full transition-colors"
                 >
                   <X size={20} />
                 </button>
               </div>
 
-              <div className="p-8 text-center">
-                 <div className="mb-6 flex items-center justify-center gap-2 text-gray-500 font-bold bg-gray-100 py-2 rounded-lg">
-                    <Clock size={20} />
+              <div className="p-6 text-center overflow-y-auto">
+                 <div className="mb-4 flex items-center justify-center gap-2 text-gray-500 font-bold bg-gray-100 py-2 rounded-lg text-sm">
+                    <Clock size={16} />
                     <span>4:00 PM - 10:00 PM</span>
                  </div>
                  
-                 <p className="text-gray-700 text-lg leading-relaxed mb-6 font-medium">
+                 <p className="text-gray-700 text-base leading-relaxed mb-4 font-medium">
                    ¡Ey! 👋 Te recordamos que nuestras {eveningCategory === 'burgers' ? 'deliciosas hamburguesas 🍔' : 'increíbles perros calientes 🌭'} están disponibles todos los días en el horario de la tarde-noche.
                  </p>
 
-                 <div className="bg-yellow-50 border-l-4 border-fifo-yellow p-4 mb-8 text-left text-sm text-yellow-800">
+                 <div className="bg-yellow-50 border-l-4 border-fifo-yellow p-3 mb-6 text-left text-xs text-yellow-800">
                     <p>Si ya son más de las 4:00pm, ¡Escríbenos para pedir tu favorito!</p>
                  </div>
 
@@ -544,9 +544,9 @@ function App() {
                      setSelectedCategory(eveningCategory);
                      handleOrderNow();
                    }}
-                   className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 uppercase tracking-wide"
+                   className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 uppercase tracking-wide text-sm"
                  >
-                   <MessageCircle size={24} fill="white" />
+                   <MessageCircle size={20} fill="white" />
                    ¡Pídelo Ya!
                  </button>
               </div>
@@ -556,41 +556,41 @@ function App() {
 
       {/* Ice Cream Modal */}
       {showIceCreamModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setShowIceCreamModal(false)}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowIceCreamModal(false)}>
            <div 
-             className="bg-white rounded-3xl w-full max-w-md p-0 overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200"
+             className="bg-white rounded-2xl w-full max-w-md p-0 overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col"
              onClick={e => e.stopPropagation()}
            >
               {/* Header with Pattern */}
-              <div className="bg-fifo-yellow h-32 relative flex items-center justify-center overflow-hidden">
+              <div className="bg-fifo-yellow h-28 relative flex items-center justify-center overflow-hidden shrink-0">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-10"></div>
                 <div className="relative z-10 flex flex-col items-center">
-                    <div className="bg-white p-3 rounded-full shadow-lg mb-2">
-                      <IceCream size={32} className="text-fifo-red" />
+                    <div className="bg-white p-2 rounded-full shadow-lg mb-1">
+                      <IceCream size={24} className="text-fifo-red" />
                     </div>
-                    <h3 className="text-2xl font-black text-fifo-darkRed uppercase tracking-wide text-center leading-none">
+                    <h3 className="text-xl font-black text-fifo-darkRed uppercase tracking-wide text-center leading-none">
                       Helados 🍦
                     </h3>
                 </div>
                 <button 
                   onClick={() => setShowIceCreamModal(false)}
-                  className="absolute top-4 right-4 bg-black/10 hover:bg-black/20 text-fifo-darkRed p-2 rounded-full transition-colors"
+                  className="absolute top-3 right-3 bg-black/10 hover:bg-black/20 text-fifo-darkRed p-2 rounded-full transition-colors"
                 >
                   <X size={20} />
                 </button>
               </div>
 
-              <div className="p-8 text-center">
-                 <div className="mb-6 flex items-center justify-center gap-2 text-gray-500 font-bold bg-gray-100 py-2 rounded-lg">
-                    <PartyPopper size={20} className="text-fifo-red" />
+              <div className="p-6 text-center overflow-y-auto">
+                 <div className="mb-4 flex items-center justify-center gap-2 text-gray-500 font-bold bg-gray-100 py-2 rounded-lg text-sm">
+                    <PartyPopper size={16} className="text-fifo-red" />
                     <span>Lugar de Encuentro</span>
                  </div>
                  
-                 <p className="text-gray-700 text-lg leading-relaxed mb-6 font-medium">
+                 <p className="text-gray-700 text-base leading-relaxed mb-4 font-medium">
                    ¡Recuerda que para realizar un pedido de helados debes estar en tu lugar de encuentro <span className="text-fifo-red font-black">Grupo Fifo</span>! 🎉
                  </p>
 
-                 <div className="bg-yellow-50 border-l-4 border-fifo-yellow p-4 mb-8 text-left text-sm text-yellow-800">
+                 <div className="bg-yellow-50 border-l-4 border-fifo-yellow p-3 mb-6 text-left text-xs text-yellow-800">
                     <p>Nuestros helados son para consumo inmediato o retiro en tienda.</p>
                  </div>
 
@@ -600,9 +600,9 @@ function App() {
                      setSelectedCategory('ice_cream');
                      handleOrderNow();
                    }}
-                   className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 uppercase tracking-wide mb-3"
+                   className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 uppercase tracking-wide mb-2 text-sm"
                  >
-                   <MessageCircle size={24} fill="white" />
+                   <MessageCircle size={20} fill="white" />
                    ¡Pídelo Ya!
                  </button>
               </div>
