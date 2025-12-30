@@ -183,14 +183,18 @@ export const SupabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const recordView = async (productId: string) => {
-    const { data } = await supabase.from('product_stats').select('views').eq('product_id', productId).single();
-    await supabase.from('product_stats').upsert({
-      product_id: productId,
-      views: (data?.views || 0) + 1
-    }, { onConflict: 'product_id' });
+    // UPDATED: Use the new secure RPC function defined in your SQL script
+    // This replaces the direct table update which is now restricted by RLS
+    const { error } = await supabase.rpc('increment_product_view', { p_id: productId });
+    
+    if (error) {
+      console.error("Error recording view:", error);
+    }
   };
 
   const recordPurchase = async (productId: string, quantity: number) => {
+    // Note: ensure you have an RPC or policy for purchases in your SQL as well, 
+    // otherwise this might fail if RLS is strict on updates.
     const { data } = await supabase.from('product_stats').select('purchases').eq('product_id', productId).single();
     await supabase.from('product_stats').upsert({
       product_id: productId,

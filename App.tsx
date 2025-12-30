@@ -10,7 +10,7 @@ import { ProductDetailModal } from './components/ProductDetailModal';
 import { InfoSections } from './components/InfoSections';
 import { NewsSection } from './components/NewsSection';
 import { FavoritesModal } from './components/FavoritesModal';
-import { Filter, RefreshCw, CheckCircle, PartyPopper, ShoppingBag, Clock, Utensils, X, MessageCircle, Drumstick, Sandwich, IceCream, Info } from 'lucide-react';
+import { Filter, RefreshCw, CheckCircle, PartyPopper, ShoppingBag, Clock, Utensils, X, MessageCircle, Drumstick, Sandwich, IceCream, Info, Search } from 'lucide-react';
 import { useSupabase } from './contexts/SupabaseContext';
 
 // --- CONFIGURACIÓN DE GOOGLE SHEETS ---
@@ -26,6 +26,7 @@ function App() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isLoadingUpdates, setIsLoadingUpdates] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(''); // Estado para la búsqueda
   
   // States for UX Interactions
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -223,11 +224,27 @@ function App() {
 
   const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
-  // Filter Logic
+  // Filter Logic (Updated with Search)
   const filteredProducts = useMemo(() => {
-    if (selectedCategory === 'all') return products;
-    return products.filter(p => p.category === selectedCategory);
-  }, [selectedCategory, products]);
+    let result = products;
+
+    // 1. Filter by Category
+    if (selectedCategory !== 'all') {
+      result = result.filter(p => p.category === selectedCategory);
+    }
+
+    // 2. Filter by Search Query
+    if (searchQuery.trim()) {
+       const query = searchQuery.toLowerCase();
+       result = result.filter(p => 
+          p.name.toLowerCase().includes(query) || 
+          p.description.toLowerCase().includes(query) ||
+          p.items?.some(i => i.toLowerCase().includes(query))
+       );
+    }
+
+    return result;
+  }, [selectedCategory, products, searchQuery]);
 
   const categories = [
     { id: 'all', label: 'Todos' },
@@ -264,6 +281,28 @@ function App() {
 
       <main className="container mx-auto px-4 -mt-8 relative z-20" id="menu">
         
+        {/* Search Bar */}
+        <div className="relative mb-6 bg-white rounded-xl shadow-lg p-1 animate-in slide-in-from-bottom-2 duration-300">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <input 
+              type="text"
+              placeholder="¿Qué se te antoja hoy? (Ej: Pizza, Hamburguesa...)"
+              className="w-full pl-12 pr-10 py-3 rounded-lg bg-transparent outline-none text-gray-700 placeholder:text-gray-400 font-medium"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 bg-gray-100 rounded-full text-gray-400 hover:text-fifo-red transition-colors"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Filter Scrollbar - FIXED FOR HORIZONTAL SCROLLING */}
         <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
           <div className="flex gap-2 md:gap-3 overflow-x-auto pb-4 pt-2 px-1 scrollbar-hide w-full max-w-full">
@@ -321,9 +360,19 @@ function App() {
         </div>
 
         {filteredProducts.length === 0 && (
-          <div className="text-center py-20 text-gray-400">
-            <Filter size={48} className="mx-auto mb-4 opacity-50" />
-            <p className="text-xl font-medium">No hay productos en esta categoría.</p>
+          <div className="text-center py-20 text-gray-400 animate-in fade-in zoom-in-95">
+            {searchQuery ? (
+               <>
+                <Search size={48} className="mx-auto mb-4 opacity-50" />
+                <p className="text-xl font-medium">No encontramos "{searchQuery}"</p>
+                <p className="text-sm">Intenta buscar en otra categoría o con otro nombre.</p>
+               </>
+            ) : (
+               <>
+                <Filter size={48} className="mx-auto mb-4 opacity-50" />
+                <p className="text-xl font-medium">No hay productos en esta categoría.</p>
+               </>
+            )}
           </div>
         )}
       </main>
