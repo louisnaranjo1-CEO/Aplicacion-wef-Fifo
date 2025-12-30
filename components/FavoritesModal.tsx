@@ -2,19 +2,27 @@ import React from 'react';
 import { X, Heart, ShoppingBag } from 'lucide-react';
 import { useSupabase } from '../contexts/SupabaseContext';
 import { Product } from '../types';
-import { products } from '../data';
 
 interface FavoritesModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddToCart: (product: Product) => void;
+  products?: Product[]; // Added prop to receive current products from Supabase
 }
 
-export const FavoritesModal: React.FC<FavoritesModalProps> = ({ isOpen, onClose, onAddToCart }) => {
+const FALLBACK_IMAGE = "https://kczgnxjubrmoucgvpvxf.supabase.co/storage/v1/object/public/order_proofs/logo%20nuevo1.png";
+
+export const FavoritesModal: React.FC<FavoritesModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  onAddToCart,
+  products = [] // Default to empty array if not passed
+}) => {
   const { favorites } = useSupabase();
 
   if (!isOpen) return null;
 
+  // Filter the passed products (which come from Supabase) based on favorite IDs
   const favoriteProducts = products.filter(p => favorites.includes(p.id));
 
   return (
@@ -42,7 +50,16 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({ isOpen, onClose,
           ) : (
             favoriteProducts.map((item) => (
               <div key={item.id} className="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex gap-4">
-                <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg bg-gray-100 shrink-0" />
+                <div className="w-20 h-20 bg-gray-100 rounded-lg shrink-0 overflow-hidden flex items-center justify-center border border-gray-100 p-1">
+                    <img 
+                        src={item.image || FALLBACK_IMAGE} 
+                        alt={item.name} 
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                            e.currentTarget.src = FALLBACK_IMAGE;
+                        }}
+                    />
+                </div>
                 
                 <div className="flex-1 flex flex-col justify-between">
                   <div>

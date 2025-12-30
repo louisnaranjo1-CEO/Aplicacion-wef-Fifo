@@ -11,6 +11,8 @@ interface ProductDetailModalProps {
   onAdd: (product: Product, variant?: ProductVariant, quantity?: number) => void;
 }
 
+const FALLBACK_IMAGE = "https://kczgnxjubrmoucgvpvxf.supabase.co/storage/v1/object/public/order_proofs/logo%20nuevo1.png";
+
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ 
   isOpen, 
   onClose, 
@@ -21,6 +23,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     product?.variants ? product.variants[0] : undefined
   );
   const [quantity, setQuantity] = useState(1);
+  const [imgSrc, setImgSrc] = useState('');
   const { recordView } = useSupabase();
 
   // Reset variant and quantity when product changes
@@ -32,6 +35,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         setSelectedVariant(undefined);
       }
       setQuantity(1);
+      setImgSrc(product.image || FALLBACK_IMAGE);
       
       // Track View
       recordView(product.id).catch(err => console.error("Error tracking view", err));
@@ -82,11 +86,14 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         {/* Image Area - Reduced height for mobile visibility */}
         <div className="relative h-48 md:h-64 bg-gray-100 flex items-center justify-center p-4 group shrink-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-gray-200 opacity-50"></div>
+          
           <img 
-            src={product.image} 
+            src={imgSrc} 
             alt={product.name} 
-            className="w-full h-full object-contain drop-shadow-xl transform transition-transform duration-500 group-hover:scale-105"
+            onError={() => setImgSrc(FALLBACK_IMAGE)}
+            className={`w-full h-full object-contain drop-shadow-xl transform transition-transform duration-500 group-hover:scale-105 ${imgSrc === FALLBACK_IMAGE ? 'opacity-80 p-8' : ''}`}
           />
+          
           {product.promoLabel && (
             <div className="absolute bottom-2 left-2 bg-fifo-yellow text-fifo-red font-black px-2 py-1 rounded-lg text-xs shadow-lg animate-bounce">
               {product.promoLabel}

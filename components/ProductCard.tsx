@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Flame, Eye, Minus, Heart } from 'lucide-react';
 import { Product, ProductVariant } from '../types';
 import { useSupabase } from '../contexts/SupabaseContext';
@@ -10,6 +10,8 @@ interface ProductCardProps {
   isHighlighted?: boolean;
 }
 
+const FALLBACK_IMAGE = "https://kczgnxjubrmoucgvpvxf.supabase.co/storage/v1/object/public/order_proofs/logo%20nuevo1.png";
+
 export const ProductCard: React.FC<ProductCardProps> = ({ 
   product, 
   onAdd, 
@@ -20,7 +22,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     product.variants ? product.variants[0] : undefined
   );
   const [quantity, setQuantity] = useState(1);
+  const [imgSrc, setImgSrc] = useState(product.image || FALLBACK_IMAGE);
   
+  // Update image if product changes
+  useEffect(() => {
+    setImgSrc(product.image || FALLBACK_IMAGE);
+  }, [product.image]);
+
   const { favorites, toggleFavorite, user } = useSupabase();
   const isFavorite = favorites.includes(product.id);
 
@@ -91,10 +99,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/5 transition-colors z-10">
             <Eye className="text-gray-800 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hidden md:block" />
         </div>
+        
         <img 
-          src={product.image} 
+          src={imgSrc} 
           alt={product.name} 
-          className="w-full h-full object-contain transform md:group-hover:scale-110 transition-transform duration-500 drop-shadow-md md:drop-shadow-xl"
+          onError={() => setImgSrc(FALLBACK_IMAGE)}
+          className={`w-full h-full object-contain transform md:group-hover:scale-110 transition-transform duration-500 drop-shadow-md md:drop-shadow-xl ${imgSrc === FALLBACK_IMAGE ? 'opacity-80 p-4' : ''}`}
         />
         
         {/* Price Tag Mobile Optimized (Smaller) */}

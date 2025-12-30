@@ -723,6 +723,7 @@ function App() {
       <FavoritesModal 
         isOpen={showFavoritesModal}
         onClose={() => setShowFavoritesModal(false)}
+        products={products}
         onAddToCart={(product) => {
           addToCart(product);
           setShowFavoritesModal(false);
