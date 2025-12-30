@@ -123,14 +123,13 @@ function App() {
         if (data) {
           // Map DB columns to Frontend Types if needed
           // Supabase returns snake_case, frontend uses camelCase mostly but interface matches mostly.
-          // Adjust 'is_popular' to 'isPopular' etc.
           const mappedProducts: Product[] = data.map((p: any) => ({
             id: p.id,
             name: p.name,
-            price: p.price ?? p.price_usd ?? 0, // Ensure numeric price from either column
+            price: p.price ?? p.price_usd ?? 0, // Handle price or price_usd
             description: p.description,
             category: p.category,
-            image: p.image,
+            image: p.image || p.image_url, // Handle image or image_url
             items: p.items || [],
             isPopular: p.is_popular,
             promoLabel: p.promo_label,

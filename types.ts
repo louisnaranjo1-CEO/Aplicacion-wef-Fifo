@@ -11,7 +11,7 @@ export interface Product {
   description: string;
   items: string[];
   image: string;
-  category: 'pizza' | 'chicken' | 'breakfast' | 'party' | 'ice_cream' | 'drinks' | 'bakery' | 'refrigerated' | 'sausages' | 'butchery' | 'burgers' | 'hot_dogs' | 'other';
+  category: 'pizza' | 'chicken' | 'breakfast' | 'party' | 'ice_cream' | 'drinks' | 'bakery' | 'refrigerated' | 'sausages' | 'butchery' | 'burgers' | 'hot_dogs' | 'self_service' | 'other';
   isPopular?: boolean;
   promoLabel?: string;
   variants?: ProductVariant[];
