@@ -51,7 +51,7 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({ isOpen, onClose,
                   </div>
                   
                   <div className="flex justify-between items-end mt-2">
-                    <span className="font-black text-fifo-red text-lg">${item.price.toFixed(2)}</span>
+                    <span className="font-black text-fifo-red text-lg">${(item.price || 0).toFixed(2)}</span>
                     <button 
                       onClick={() => onAddToCart(item)}
                       className="bg-fifo-yellow text-fifo-darkRed px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 hover:bg-yellow-400 transition-colors shadow-sm"

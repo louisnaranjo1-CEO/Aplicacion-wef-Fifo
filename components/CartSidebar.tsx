@@ -20,7 +20,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
   onRemove,
   onCheckout
 }) => {
-  const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const total = cart.reduce((acc, item) => acc + ((item.price || 0) * item.quantity), 0);
 
   if (!isOpen) return null;
 
@@ -97,7 +97,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                       </button>
                     </div>
                     <div className="font-black text-lg text-fifo-red whitespace-nowrap ml-2">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ${((item.price || 0) * item.quantity).toFixed(2)}
                     </div>
                   </div>
                 </div>

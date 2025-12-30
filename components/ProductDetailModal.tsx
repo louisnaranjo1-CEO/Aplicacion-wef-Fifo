@@ -40,7 +40,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
   if (!isOpen || !product) return null;
 
-  const currentPrice = selectedVariant ? selectedVariant.price : product.price;
+  const currentPrice = (selectedVariant ? selectedVariant.price : product.price) || 0;
 
   const handleAdd = () => {
     onAdd(product, selectedVariant, quantity);

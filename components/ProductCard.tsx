@@ -24,7 +24,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const { favorites, toggleFavorite, user } = useSupabase();
   const isFavorite = favorites.includes(product.id);
 
-  const currentPrice = selectedVariant ? selectedVariant.price : product.price;
+  const currentPrice = (selectedVariant ? selectedVariant.price : product.price) || 0;
   const isPromo = Boolean(product.isPopular || product.promoLabel);
 
   const handleImageClick = () => {

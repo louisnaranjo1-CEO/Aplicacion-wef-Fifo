@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { products as initialProducts } from './data';
+// import { products as initialProducts } from './data'; // Removed static import
 import { Product, CartItem, ProductVariant } from './types';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
@@ -10,23 +10,48 @@ import { ProductDetailModal } from './components/ProductDetailModal';
 import { InfoSections } from './components/InfoSections';
 import { NewsSection } from './components/NewsSection';
 import { FavoritesModal } from './components/FavoritesModal';
-import { Filter, RefreshCw, CheckCircle, PartyPopper, ShoppingBag, Clock, Utensils, X, MessageCircle, Drumstick, Sandwich, IceCream, Info, Search } from 'lucide-react';
+import { Filter, RefreshCw, CheckCircle, PartyPopper, ShoppingBag, Clock, Utensils, X, MessageCircle, Drumstick, Sandwich, IceCream, Info, Search, Sparkles } from 'lucide-react';
 import { useSupabase } from './contexts/SupabaseContext';
+import { supabase } from './supabaseClient'; // Import direct supabase client for fetching
 
-// --- CONFIGURACIÓN DE GOOGLE SHEETS ---
-// 1. Crea un Google Sheet con las columnas: id, name, price, description
-// 2. Ve a Archivo > Compartir > Publicar en la web > Formato CSV
-// 3. Pega el enlace aquí abajo:
-const GOOGLE_SHEET_URL = ""; 
+// --- CONFIGURACIÓN DE GOOGLE SHEETS (Deshabilitada temporalmente en favor de Supabase) ---
+// const GOOGLE_SHEET_URL = ""; 
+
+// --- ALGORITMO DE DISTANCIA DE LEVENSHTEIN (Corrección Ortográfica) ---
+function getLevenshteinDistance(a: string, b: string): number {
+  const matrix = [];
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+
+  for (let i = 0; i <= b.length; i++) { matrix[i] = [i]; }
+  for (let j = 0; j <= a.length; j++) { matrix[0][j] = j; }
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1).toLowerCase() === a.charAt(j - 1).toLowerCase()) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // sustitución
+          Math.min(
+            matrix[i][j - 1] + 1,   // inserción
+            matrix[i - 1][j] + 1    // eliminación
+          )
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
 
 function App() {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [products, setProducts] = useState<Product[]>([]); // Initialize empty
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [isLoadingUpdates, setIsLoadingUpdates] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(''); // Estado para la búsqueda
+  const [isLoadingUpdates, setIsLoadingUpdates] = useState(true); // Default loading
+  const [searchQuery, setSearchQuery] = useState(''); 
   
   // States for UX Interactions
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -49,9 +74,7 @@ function App() {
 
   // Initial Effect: BCV Notification
   useEffect(() => {
-    // Show immediately
     setShowBCVToast(true);
-    // Hide after 5 seconds
     const timer = setTimeout(() => {
       setShowBCVToast(false);
     }, 5000);
@@ -61,26 +84,16 @@ function App() {
   // --- NOTIFICACIONES DE CARRITO ABANDONADO ---
   useEffect(() => {
     let notificationTimer: ReturnType<typeof setTimeout>;
-
-    // Solo configurar si hay items en el carrito y NO estamos en el checkout
     if (cart.length > 0 && !isCheckoutOpen) {
-      
-      // NOTA: La solicitud de permiso se movió a addToCart para cumplir con políticas de navegadores
-      
-      // Configurar temporizador (1 minuto de inactividad para demostración)
       notificationTimer = setTimeout(() => {
         if ('Notification' in window && Notification.permission === 'granted') {
           try {
-            // Enviar notificación al sistema (Barra de estado del teléfono)
             const notif = new Notification("🍔 ¡Tu pedido te espera!", {
               body: "¡Tienes en tu carrito un rico pedido esperando por ti, pide ya!",
               icon: "https://gqdfbwdocqrkziacvzkb.supabase.co/storage/v1/object/public/Louis%20Marketing/Grupo%20Fifo/logo%20nuevo2.png",
-              tag: "fifo-cart-reminder", // Evita que se acumulen muchas notificaciones iguales
-              requireInteraction: true, // Se queda en pantalla hasta que el usuario la vea
-              badge: "https://gqdfbwdocqrkziacvzkb.supabase.co/storage/v1/object/public/Louis%20Marketing/Grupo%20Fifo/logo%20nuevo2.png"
+              tag: "fifo-cart-reminder",
+              requireInteraction: true,
             });
-
-            // Al hacer click, enfocar la ventana y abrir el carrito
             notif.onclick = function() {
               window.focus();
               setIsCartOpen(true);
@@ -90,83 +103,72 @@ function App() {
             console.error("Error enviando notificación", e);
           }
         }
-      }, 60000); // 60000 ms = 1 minuto
+      }, 60000); 
     }
-
-    // Limpiar temporizador si el componente se desmonta, el carrito cambia (usuario activo) o abre checkout
     return () => clearTimeout(notificationTimer);
   }, [cart, isCheckoutOpen]);
 
-  // Logic to fetch prices from Google Sheets
+  // --- FETCH PRODUCTS FROM SUPABASE ---
   useEffect(() => {
-    if (!GOOGLE_SHEET_URL) return;
-
-    const fetchPrices = async () => {
+    const fetchProducts = async () => {
       setIsLoadingUpdates(true);
       try {
-        const response = await fetch(GOOGLE_SHEET_URL);
-        const text = await response.text();
-        
-        // Simple CSV Parser
-        const rows = text.split('\n').slice(1); // Skip header
-        const updates = new Map();
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('is_active', true); // Only fetch active products
 
-        rows.forEach(row => {
-          // Handle commas inside quotes if necessary, but for simplicity basic split:
-          // This regex handles basic CSV splitting respecting quotes
-          const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-          if (!cols) return;
-          
-          const cleanCols = cols.map(c => c.replace(/^"|"$/g, '').trim());
-          const [id, name, priceStr, description] = cleanCols;
+        if (error) throw error;
 
-          if (id) {
-            updates.set(id, {
-              name: name,
-              price: priceStr ? parseFloat(priceStr) : undefined,
-              description: description
-            });
-          }
-        });
-
-        // Merge updates with local data
-        setProducts(currentProducts => 
-          currentProducts.map(p => {
-            const update = updates.get(p.id);
-            if (update) {
-              return {
-                ...p,
-                name: update.name || p.name,
-                price: update.price !== undefined && !isNaN(update.price) ? update.price : p.price,
-                description: update.description || p.description,
-              };
-            }
-            return p;
-          })
-        );
-        console.log("Precios actualizados desde la hoja de cálculo");
-
-      } catch (error) {
-        console.error("Error al cargar precios de Google Sheets:", error);
+        if (data) {
+          // Map DB columns to Frontend Types if needed
+          // Supabase returns snake_case, frontend uses camelCase mostly but interface matches mostly.
+          // Adjust 'is_popular' to 'isPopular' etc.
+          const mappedProducts: Product[] = data.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            price: p.price ?? p.price_usd ?? 0, // Ensure numeric price from either column
+            description: p.description,
+            category: p.category,
+            image: p.image,
+            items: p.items || [],
+            isPopular: p.is_popular,
+            promoLabel: p.promo_label,
+            variants: p.variants ? (typeof p.variants === 'string' ? JSON.parse(p.variants) : p.variants) : undefined
+          }));
+          setProducts(mappedProducts);
+        }
+      } catch (err) {
+        console.error("Error fetching products from Supabase:", err);
       } finally {
         setIsLoadingUpdates(false);
       }
     };
 
-    fetchPrices();
+    fetchProducts();
+    
+    // Optional: Realtime subscription for price updates
+    const subscription = supabase
+      .channel('public:products')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
+        console.log('Cambio detectado en productos:', payload);
+        fetchProducts(); // Refresh on any change
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, []);
 
   // Cart Logic
   const addToCart = (product: Product, variant?: ProductVariant, quantity: number = 1) => {
-    // 1. Solicitar permiso de notificaciones con interacción del usuario (Crucial para móviles)
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
     }
 
     setCart(prev => {
-      // Create a unique ID for the cart item based on product ID AND variant ID
       const cartId = variant ? `${product.id}-${variant.id}` : product.id;
-      
       const existing = prev.find(item => item.cartId === cartId);
       
       if (existing) {
@@ -175,19 +177,17 @@ function App() {
         );
       }
 
-      // If it's a new item, construct the CartItem object
       const newItem: CartItem = {
         ...product,
         cartId: cartId,
         quantity: quantity,
         selectedVariant: variant,
-        price: variant ? variant.price : product.price // Override base price with variant price
+        price: variant ? variant.price : (product.price || 0) 
       };
       
       return [...prev, newItem];
     });
 
-    // Show Notification instead of opening cart
     setAddedNotification({ name: product.name, quantity });
     setTimeout(() => setAddedNotification(null), 2500);
   };
@@ -205,46 +205,18 @@ function App() {
     }));
   };
 
-  // Scroll and Highlight Logic
   const handleOrderNow = () => {
     const menuSection = document.getElementById('menu');
     if (menuSection) {
       menuSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    
-    // Trigger effects
     setIsHighlighting(true);
     setShowReadyToast(true);
-
-    // Turn off highlight after animation
     setTimeout(() => setIsHighlighting(false), 2500);
-    // Hide toast a bit later
     setTimeout(() => setShowReadyToast(false), 3500);
   };
 
   const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
-
-  // Filter Logic (Updated with Search)
-  const filteredProducts = useMemo(() => {
-    let result = products;
-
-    // 1. Filter by Category
-    if (selectedCategory !== 'all') {
-      result = result.filter(p => p.category === selectedCategory);
-    }
-
-    // 2. Filter by Search Query
-    if (searchQuery.trim()) {
-       const query = searchQuery.toLowerCase();
-       result = result.filter(p => 
-          p.name.toLowerCase().includes(query) || 
-          p.description.toLowerCase().includes(query) ||
-          p.items?.some(i => i.toLowerCase().includes(query))
-       );
-    }
-
-    return result;
-  }, [selectedCategory, products, searchQuery]);
 
   const categories = [
     { id: 'all', label: 'Todos' },
@@ -261,7 +233,59 @@ function App() {
     { id: 'drinks', label: 'Bebidas 🥤' },
     { id: 'party', label: 'Combos Fiesta' },
     { id: 'ice_cream', label: 'Helados 🍦' },
+    { id: 'other', label: 'Otros' }
   ];
+
+  // Filter Logic
+  const filteredProducts = useMemo(() => {
+    let result = products;
+
+    if (selectedCategory !== 'all') {
+      result = result.filter(p => p.category === selectedCategory);
+    }
+
+    if (searchQuery.trim()) {
+       const query = searchQuery.toLowerCase();
+       result = result.filter(p => 
+          p.name.toLowerCase().includes(query) || 
+          p.description.toLowerCase().includes(query) ||
+          (p.items && p.items.some(i => i.toLowerCase().includes(query)))
+       );
+    }
+
+    return result;
+  }, [selectedCategory, products, searchQuery]);
+
+  // Search Suggestions Logic
+  const searchSuggestion = useMemo(() => {
+    if (!searchQuery.trim() || filteredProducts.length > 0) return null;
+
+    const query = searchQuery.trim();
+    const candidates = [
+        ...categories.filter(c => c.id !== 'all').map(c => ({ term: c.label.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim(), type: 'Categoría' })), 
+        ...products.map(p => ({ term: p.name, type: 'Producto' }))
+    ];
+
+    let bestMatch = null;
+    let minDistance = Infinity;
+
+    candidates.forEach(candidate => {
+        const dist = getLevenshteinDistance(query, candidate.term);
+        const maxErrors = candidate.term.length <= 4 ? 1 : 3;
+        if (dist < minDistance && dist <= maxErrors) {
+            minDistance = dist;
+            bestMatch = candidate.term;
+        }
+    });
+
+    return bestMatch;
+  }, [searchQuery, filteredProducts, products, categories]);
+
+  const applySuggestion = () => {
+    if (searchSuggestion) {
+        setSearchQuery(searchSuggestion);
+    }
+  };
 
   const openSelfServiceWhatsApp = () => {
      const message = "Hola *GRUPO FIFO* 👋! Estoy interesado en conocer el *Menú del Día* del Self Service.";
@@ -303,7 +327,7 @@ function App() {
           </div>
         </div>
 
-        {/* Filter Scrollbar - FIXED FOR HORIZONTAL SCROLLING */}
+        {/* Filter Scrollbar */}
         <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
           <div className="flex gap-2 md:gap-3 overflow-x-auto pb-4 pt-2 px-1 scrollbar-hide w-full max-w-full">
             {categories.map(cat => (
@@ -341,12 +365,12 @@ function App() {
           
           {isLoadingUpdates && (
             <div className="text-xs text-gray-400 flex items-center gap-2 animate-pulse whitespace-nowrap">
-              <RefreshCw size={12} className="animate-spin" /> Actualizando precios...
+              <RefreshCw size={12} className="animate-spin" /> Actualizando menú...
             </div>
           )}
         </div>
 
-        {/* Product Grid - Updated to 2 columns on mobile (grid-cols-2) with tighter gap */}
+        {/* Product Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-6">
           {filteredProducts.map(product => (
             <ProductCard 
@@ -359,13 +383,27 @@ function App() {
           ))}
         </div>
 
-        {filteredProducts.length === 0 && (
+        {/* Empty States */}
+        {!isLoadingUpdates && filteredProducts.length === 0 && (
           <div className="text-center py-20 text-gray-400 animate-in fade-in zoom-in-95">
             {searchQuery ? (
                <>
                 <Search size={48} className="mx-auto mb-4 opacity-50" />
-                <p className="text-xl font-medium">No encontramos "{searchQuery}"</p>
-                <p className="text-sm">Intenta buscar en otra categoría o con otro nombre.</p>
+                <p className="text-xl font-medium mb-1">No encontramos "{searchQuery}"</p>
+                {searchSuggestion ? (
+                    <div className="mt-4 animate-in slide-in-from-bottom-2 duration-500">
+                        <p className="text-sm text-gray-500 mb-2">Quizás quisiste decir:</p>
+                        <button 
+                            onClick={applySuggestion}
+                            className="bg-fifo-yellow/20 text-fifo-darkRed px-6 py-2 rounded-full font-bold text-lg hover:bg-fifo-yellow hover:scale-105 transition-all flex items-center gap-2 mx-auto group"
+                        >
+                            <Sparkles size={18} className="text-fifo-red group-hover:rotate-12 transition-transform" />
+                            {searchSuggestion}
+                        </button>
+                    </div>
+                ) : (
+                    <p className="text-sm">Intenta buscar en otra categoría o con otro nombre.</p>
+                )}
                </>
             ) : (
                <>
@@ -377,19 +415,14 @@ function App() {
         )}
       </main>
 
-      {/* Promotional Info Sections */}
       <InfoSections onOrderNow={handleOrderNow} />
-
-      {/* News Section */}
       <NewsSection onOrderNow={handleOrderNow} />
 
-      {/* BCV Flash Notification */}
+      {/* BCV Toast */}
       {showBCVToast && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[110] w-[95%] max-w-md animate-[slide-down_0.5s_ease-out_forwards]">
           <div className="bg-blue-600/95 backdrop-blur-md text-white p-4 rounded-2xl shadow-2xl flex items-start gap-4 border-2 border-white/20 relative overflow-hidden">
-            {/* Background element */}
             <div className="absolute -right-4 -bottom-4 bg-white/10 w-24 h-24 rounded-full blur-2xl"></div>
-            
             <div className="bg-white p-2 rounded-xl shrink-0 shadow-lg relative z-10">
               <img 
                 src="https://gqdfbwdocqrkziacvzkb.supabase.co/storage/v1/object/public/Louis%20Marketing/Grupo%20Fifo/bcv.png" 
@@ -412,7 +445,7 @@ function App() {
         </div>
       )}
 
-      {/* Added to Cart Notification Toast */}
+      {/* Added to Cart Toast */}
       {addedNotification && (
         <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[100] animate-[slide-up_0.3s_ease-out_forwards] w-[90%] max-w-sm">
           <div className="bg-gray-900/95 backdrop-blur-md text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center justify-between border border-gray-700">
@@ -435,7 +468,7 @@ function App() {
         </div>
       )}
 
-      {/* Ready Notification Toast (from Hero/News CTA) */}
+      {/* Ready Toast */}
       {showReadyToast && (
         <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-[60] animate-[bounce-in_0.5s_ease-out_forwards]">
           <div className="bg-green-500 text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 border-4 border-white/20">
@@ -475,7 +508,6 @@ function App() {
         }}
       />
 
-      {/* Detail Modal */}
       <ProductDetailModal 
         isOpen={!!selectedProduct}
         product={selectedProduct}
@@ -490,7 +522,6 @@ function App() {
              className="bg-white rounded-2xl w-full max-w-md p-0 overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col"
              onClick={e => e.stopPropagation()}
            >
-              {/* Header with Pattern */}
               <div className="bg-fifo-yellow h-28 relative flex items-center justify-center overflow-hidden shrink-0">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-10"></div>
                 <div className="relative z-10 flex flex-col items-center">
@@ -516,11 +547,9 @@ function App() {
                  <p className="text-gray-700 text-base leading-relaxed mb-4 font-medium">
                    ¡Hola! 👋 Te recordamos que nuestro <span className="text-fifo-red font-bold">Self Service</span> y los deliciosos combos de <span className="text-fifo-red font-bold">Pollo a la Broaster</span> solo están disponibles en el horario del almuerzo.
                  </p>
-
                  <div className="bg-yellow-50 border-l-4 border-fifo-yellow p-3 mb-6 text-left text-xs text-yellow-800">
                     <p>Acércate a nuestra sección de Self Service o escríbenos para saber qué preparamos hoy para ti. 🍲</p>
                  </div>
-
                  <button 
                    onClick={openSelfServiceWhatsApp}
                    className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 uppercase tracking-wide text-sm"
@@ -533,14 +562,13 @@ function App() {
         </div>
       )}
 
-      {/* Pollo a la Broaster Modal */}
+      {/* Chicken Modal */}
       {showChickenModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowChickenModal(false)}>
            <div 
              className="bg-white rounded-2xl w-full max-w-md p-0 overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col"
              onClick={e => e.stopPropagation()}
            >
-              {/* Header with Pattern - SAME STYLE AS SELF SERVICE */}
               <div className="bg-fifo-yellow h-28 relative flex items-center justify-center overflow-hidden shrink-0">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-10"></div>
                 <div className="relative z-10 flex flex-col items-center">
@@ -562,15 +590,12 @@ function App() {
                     <Clock size={16} />
                     <span>12:00 PM - 4:00 PM</span>
                  </div>
-                 
                  <p className="text-gray-700 text-base leading-relaxed mb-4 font-medium">
                    ¡Hola! 👋 Te recordamos que nuestros crujientes combos de <span className="text-fifo-red font-bold">Pollo a la Broaster</span> solo están disponibles en el horario del almuerzo.
                  </p>
-
                  <div className="bg-yellow-50 border-l-4 border-fifo-yellow p-3 mb-6 text-left text-xs text-yellow-800">
                     <p>Escríbenos directamente para confirmar disponibilidad y pedir tu combo favorito. 🍗</p>
                  </div>
-
                  <button 
                    onClick={() => {
                      setShowChickenModal(false);
@@ -587,14 +612,13 @@ function App() {
         </div>
       )}
 
-      {/* Evening Menu Modal (Burgers & Hot Dogs) */}
+      {/* Evening Modal */}
       {showEveningModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowEveningModal(false)}>
            <div 
              className="bg-white rounded-2xl w-full max-w-md p-0 overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col"
              onClick={e => e.stopPropagation()}
            >
-              {/* Header with Pattern */}
               <div className="bg-fifo-yellow h-28 relative flex items-center justify-center overflow-hidden shrink-0">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-10"></div>
                 <div className="relative z-10 flex flex-col items-center">
@@ -622,15 +646,12 @@ function App() {
                     <Clock size={16} />
                     <span>4:00 PM - 10:00 PM</span>
                  </div>
-                 
                  <p className="text-gray-700 text-base leading-relaxed mb-4 font-medium">
                    ¡Ey! 👋 Te recordamos que nuestras {eveningCategory === 'burgers' ? 'deliciosas hamburguesas 🍔' : 'increíbles perros calientes 🌭'} están disponibles todos los días en el horario de la tarde-noche.
                  </p>
-
                  <div className="bg-yellow-50 border-l-4 border-fifo-yellow p-3 mb-6 text-left text-xs text-yellow-800">
                     <p>Si ya son más de las 4:00pm, ¡Escríbenos para pedir tu favorito!</p>
                  </div>
-
                  <button 
                    onClick={() => {
                      setShowEveningModal(false);
@@ -654,7 +675,6 @@ function App() {
              className="bg-white rounded-2xl w-full max-w-md p-0 overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col"
              onClick={e => e.stopPropagation()}
            >
-              {/* Header with Pattern */}
               <div className="bg-fifo-yellow h-28 relative flex items-center justify-center overflow-hidden shrink-0">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-10"></div>
                 <div className="relative z-10 flex flex-col items-center">
@@ -678,15 +698,12 @@ function App() {
                     <PartyPopper size={16} className="text-fifo-red" />
                     <span>Lugar de Encuentro</span>
                  </div>
-                 
                  <p className="text-gray-700 text-base leading-relaxed mb-4 font-medium">
                    ¡Recuerda que para realizar un pedido de helados debes estar en tu lugar de encuentro <span className="text-fifo-red font-black">Grupo Fifo</span>! 🎉
                  </p>
-
                  <div className="bg-yellow-50 border-l-4 border-fifo-yellow p-3 mb-6 text-left text-xs text-yellow-800">
                     <p>Nuestros helados son para consumo inmediato o retiro en tienda.</p>
                  </div>
-
                  <button 
                    onClick={() => {
                      setShowIceCreamModal(false);
@@ -703,7 +720,6 @@ function App() {
         </div>
       )}
 
-      {/* Favorites Modal */}
       <FavoritesModal 
         isOpen={showFavoritesModal}
         onClose={() => setShowFavoritesModal(false)}
@@ -730,7 +746,6 @@ function App() {
             <span>Precios sujetos a cambio sin previo aviso</span>
           </div>
 
-          {/* Developer Credits Section */}
           <div className="w-full border-t border-gray-800 pt-10 mt-4 flex justify-center pb-6">
             <a 
               href="https://louismarketingve.com/" 
@@ -738,15 +753,11 @@ function App() {
               rel="noopener noreferrer"
               className="group relative flex items-center justify-center gap-4 p-4 rounded-2xl transition-all duration-500 hover:bg-white/5"
             >
-              {/* Background ambient glow on hover */}
               <div className="absolute inset-0 bg-gradient-to-r from-fifo-red/0 via-fifo-red/10 to-fifo-yellow/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-2xl blur-xl"></div>
-              
               <span className="relative z-10 text-xl md:text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-gray-500 to-gray-400 group-hover:from-white group-hover:to-fifo-yellow transition-all duration-500 tracking-tight">
                 Página desarrollada por
               </span>
-              
               <div className="relative z-10 transform group-hover:scale-110 group-hover:rotate-2 transition-transform duration-500 ease-out">
-                {/* Logo Glow */}
                 <div className="absolute inset-0 bg-white/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <img 
                   src="https://gqdfbwdocqrkziacvzkb.supabase.co/storage/v1/object/public/Louis%20Marketing/Grupo%2019.png" 

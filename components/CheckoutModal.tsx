@@ -50,7 +50,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
      }
   }, [user, profile]);
 
-  const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const total = cart.reduce((acc, item) => acc + ((item.price || 0) * item.quantity), 0);
   const pointsToEarn = Math.floor(total);
 
   const suggestedProducts = useMemo(() => {
@@ -86,7 +86,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     cart.forEach(item => {
       const variantText = item.selectedVariant ? ` (${item.selectedVariant.name})` : '';
       const line = `${item.quantity}x ${item.name}${variantText}`;
-      message += `- ${line} - $${(item.price * item.quantity).toFixed(2)}\n`;
+      message += `- ${line} - $${((item.price || 0) * item.quantity).toFixed(2)}\n`;
       description += line + ", ";
     });
     
@@ -180,7 +180,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     <span className="font-bold text-gray-800">{item.quantity}x</span> {item.name}
                     {item.selectedVariant && <span className="text-xs text-gray-400 block">{item.selectedVariant.name}</span>}
                   </span>
-                  <span className="font-bold whitespace-nowrap">${(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="font-bold whitespace-nowrap">${((item.price || 0) * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
