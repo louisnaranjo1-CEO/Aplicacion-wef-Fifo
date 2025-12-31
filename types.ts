@@ -1,3 +1,4 @@
+
 export interface ProductVariant {
   id: string;
   name: string; // e.g., "Pequeña (P)", "Mediana (M)"
@@ -32,4 +33,15 @@ export interface OrderDetails {
   address?: string; // Only for delivery
   branch?: string; // Only for pickup
   paymentMethod: string;
+}
+
+export interface NewsEvent {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  tag: string;
+  created_at: string;
+  is_active: boolean;
+  display_order?: number;
 }

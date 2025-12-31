@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-// import { products as initialProducts } from './data'; // Removed static import
+import { products as localProducts } from './data'; 
 import { Product, CartItem, ProductVariant } from './types';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
@@ -12,10 +12,7 @@ import { NewsSection } from './components/NewsSection';
 import { FavoritesModal } from './components/FavoritesModal';
 import { Filter, RefreshCw, CheckCircle, PartyPopper, ShoppingBag, Clock, Utensils, X, MessageCircle, Drumstick, Sandwich, IceCream, Info, Search, Sparkles } from 'lucide-react';
 import { useSupabase } from './contexts/SupabaseContext';
-import { supabase } from './supabaseClient'; // Import direct supabase client for fetching
-
-// --- CONFIGURACIÓN DE GOOGLE SHEETS (Deshabilitada temporalmente en favor de Supabase) ---
-// const GOOGLE_SHEET_URL = ""; 
+import { supabase } from './supabaseClient';
 
 // --- ALGORITMO DE DISTANCIA DE LEVENSHTEIN (Corrección Ortográfica) ---
 function getLevenshteinDistance(a: string, b: string): number {
@@ -45,12 +42,12 @@ function getLevenshteinDistance(a: string, b: string): number {
 }
 
 function App() {
-  const [products, setProducts] = useState<Product[]>([]); // Initialize empty
+  const [products, setProducts] = useState<Product[]>([]); 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [isLoadingUpdates, setIsLoadingUpdates] = useState(true); // Default loading
+  const [isLoadingUpdates, setIsLoadingUpdates] = useState(true);
   const [searchQuery, setSearchQuery] = useState(''); 
   
   // States for UX Interactions
@@ -108,7 +105,7 @@ function App() {
     return () => clearTimeout(notificationTimer);
   }, [cart, isCheckoutOpen]);
 
-  // --- FETCH PRODUCTS FROM SUPABASE ---
+  // --- FETCH PRODUCTS FROM SUPABASE WITH FALLBACK ---
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoadingUpdates(true);
@@ -116,29 +113,32 @@ function App() {
         const { data, error } = await supabase
           .from('products')
           .select('*')
-          .eq('is_active', true); // Only fetch active products
+          .eq('is_active', true);
 
         if (error) throw error;
 
-        if (data) {
-          // Map DB columns to Frontend Types if needed
-          // Supabase returns snake_case, frontend uses camelCase mostly but interface matches mostly.
+        if (data && data.length > 0) {
           const mappedProducts: Product[] = data.map((p: any) => ({
             id: p.id,
             name: p.name,
-            price: p.price ?? p.price_usd ?? 0, // Handle price or price_usd
+            price: p.price ?? p.price_usd ?? 0,
             description: p.description,
             category: p.category,
-            image: p.image || p.image_url, // Handle image or image_url
+            image: p.image || p.image_url,
             items: p.items || [],
             isPopular: p.is_popular,
             promoLabel: p.promo_label,
             variants: p.variants ? (typeof p.variants === 'string' ? JSON.parse(p.variants) : p.variants) : undefined
           }));
           setProducts(mappedProducts);
+        } else {
+          // Fallback to local data if DB is empty
+          console.log("Using local data fallback");
+          setProducts(localProducts);
         }
       } catch (err) {
-        console.error("Error fetching products from Supabase:", err);
+        console.error("Error fetching products, using local data:", err);
+        setProducts(localProducts);
       } finally {
         setIsLoadingUpdates(false);
       }
@@ -146,12 +146,11 @@ function App() {
 
     fetchProducts();
     
-    // Optional: Realtime subscription for price updates
     const subscription = supabase
       .channel('public:products')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
         console.log('Cambio detectado en productos:', payload);
-        fetchProducts(); // Refresh on any change
+        fetchProducts();
       })
       .subscribe();
 
@@ -364,7 +363,7 @@ function App() {
           
           {isLoadingUpdates && (
             <div className="text-xs text-gray-400 flex items-center gap-2 animate-pulse whitespace-nowrap">
-              <RefreshCw size={12} className="animate-spin" /> Actualizando menú...
+              <RefreshCw size={12} className="animate-spin" /> Sincronizando...
             </div>
           )}
         </div>

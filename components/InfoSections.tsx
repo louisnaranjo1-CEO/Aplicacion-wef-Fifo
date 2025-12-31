@@ -15,15 +15,11 @@ export const InfoSections: React.FC<InfoSectionsProps> = ({ onOrderNow }) => {
       {/* Section 1: Haz Mercado desde Casa */}
       <div className="relative rounded-3xl overflow-hidden bg-fifo-red min-h-[400px] flex items-center shadow-2xl transform hover:scale-[1.01] transition-transform duration-300">
         <div className="absolute inset-0">
-          <video 
-            autoPlay 
-            loop 
-            muted 
-            playsInline
+          <img 
+            src="https://kczgnxjubrmoucgvpvxf.supabase.co/storage/v1/object/public/order_proofs/1230.gif"
+            alt="Fondo animado"
             className="w-full h-full object-cover opacity-60 mix-blend-multiply"
-          >
-            <source src="https://gqdfbwdocqrkziacvzkb.supabase.co/storage/v1/object/public/Louis%20Marketing/Grupo%20Fifo/13%20(1).mp4" type="video/mp4" />
-          </video>
+          />
           <div className="absolute inset-0 bg-gradient-to-r from-fifo-red via-fifo-red/80 to-transparent"></div>
         </div>
         

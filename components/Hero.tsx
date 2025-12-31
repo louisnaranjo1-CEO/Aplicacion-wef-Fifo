@@ -51,17 +51,13 @@ export const Hero: React.FC<HeroProps> = ({ onOrderNow }) => {
 
   return (
     <div className="relative text-white overflow-hidden min-h-[450px] md:min-h-[500px] flex items-center">
-      {/* Video Background */}
+      {/* GIF Background */}
       <div className="absolute inset-0 w-full h-full">
-        <video 
-          autoPlay 
-          loop 
-          muted 
-          playsInline
+        <img
+          src="https://kczgnxjubrmoucgvpvxf.supabase.co/storage/v1/object/public/order_proofs/1230.gif" 
+          alt="Fondo animado"
           className="w-full h-full object-cover"
-        >
-          <source src="https://gqdfbwdocqrkziacvzkb.supabase.co/storage/v1/object/public/Louis%20Marketing/Grupo%20Fifo/13%20%281%29.mp4" type="video/mp4" />
-        </video>
+        />
         {/* Overlays for brand color and text readability */}
         <div className="absolute inset-0 bg-fifo-red/90 mix-blend-multiply"></div>
         <div className="absolute inset-0 bg-black/10"></div>
